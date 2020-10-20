@@ -19,14 +19,14 @@ CREATE SOURCE CONNECTOR source_inventory WITH (
     'mongodb.password' = 'dbz',
     'database.whitelist' = 'inventory',
     'database.history.kafka.bootstrap.servers' = 'kafka:9092',
-    'transforms' = 'route,mongoflatten,createKey',
+    'transforms' = 'route,unwrap',
     'transforms.route.type' = 'org.apache.kafka.connect.transforms.RegexRouter',
     'transforms.route.regex' = '([^.]+)\\.([^.]+)\\.([^.]+)',
     'transforms.route.replacement' = '$3',
-    'transforms.mongoflatten.type' = 'io.debezium.connector.mongodb.transforms.ExtractNewDocumentState',
-    'transforms.mongoflatten.drop.tombstones' = 'false',
-    'transforms.createKey.type' ='org.apache.kafka.connect.transforms.ValueToKey', 
-    'transforms.createKey.fields' = 'id',
+    'transforms.unwrap.type' = 'io.debezium.connector.mongodb.transforms.ExtractNewDocumentState',
+    'transforms.unwrap.drop.tombstones' = 'false',
+    'transforms.unwrap.delete.handling.mode' = 'drop',
+    'transforms.unwrap.operation.header' = 'true',
     'key.converter' = 'org.apache.kafka.connect.storage.StringConverter'
 );
 ```
