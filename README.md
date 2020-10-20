@@ -19,7 +19,7 @@ CREATE SOURCE CONNECTOR source_inventory WITH (
     'mongodb.password' = 'dbz',
     'database.whitelist' = 'inventory',
     'database.history.kafka.bootstrap.servers' = 'kafka:9092',
-    'transforms' = 'route,unwrap',
+    'transforms' = 'route,unwrap,insertKey',
     'transforms.route.type' = 'org.apache.kafka.connect.transforms.RegexRouter',
     'transforms.route.regex' = '([^.]+)\\.([^.]+)\\.([^.]+)',
     'transforms.route.replacement' = '$3',
@@ -27,6 +27,8 @@ CREATE SOURCE CONNECTOR source_inventory WITH (
     'transforms.unwrap.drop.tombstones' = 'false',
     'transforms.unwrap.delete.handling.mode' = 'drop',
     'transforms.unwrap.operation.header' = 'true',
+    'transforms.insertKey.type' = 'org.apache.kafka.connect.transforms.ValueToKey',
+    'transforms.insertKey.fields' = 'id',
     'key.converter' = 'org.apache.kafka.connect.storage.StringConverter'
 );
 ```
