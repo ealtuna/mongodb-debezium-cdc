@@ -6,10 +6,12 @@ Initialize MongoDB replica set and insert test data:
 
     docker-compose exec mongodb bash -c '/usr/local/bin/init-inventory.sh'
 
-    docker exec -it ksqldb bash -c 'ksql http://ksqldb:8088'
-
+    
+Connect to KSQL console and create the connector:
 
 ```
+docker exec -it ksqldb bash -c 'ksql http://ksqldb:8088'
+
 CREATE SOURCE CONNECTOR source_inventory WITH (
     'connector.class' = 'io.debezium.connector.mongodb.MongoDbConnector',
     'tasks.max' = '1',
@@ -27,12 +29,27 @@ CREATE SOURCE CONNECTOR source_inventory WITH (
     'transforms.unwrap.drop.tombstones' = 'false',
     'transforms.unwrap.delete.handling.mode' = 'drop',
     'transforms.unwrap.operation.header' = 'true',
-    'transforms.insertKey.type' = 'org.apache.kafka.connect.transforms.ValueToKey',
-    'transforms.insertKey.fields' = 'id',
+    'transforms.insertKey.type' = 'org.apache.kafka.connect.transforms.ExtractField$Key',
+    'transforms.insertKey.field' = 'id',
     'key.converter' = 'org.apache.kafka.connect.storage.StringConverter'
 );
 ```
 
+From KSQL console display the change stream for orders topic:
+
+```
+SHOW TOPICS;
+PRINT orders FROM BEGINNING;
+```
+
+Execute modification statements in mongo and see how the changes go trough kafka:
+
+```
+docker exec -it mongodb bash -c "mongo -u debezium -p dbz"
+
+use inventory
+db.orders.save(Object.assign(db.orders.findOne(), { quantity: 10 }))
+```
 
 ## References
 
@@ -40,3 +57,4 @@ https://debezium.io/documentation/reference/1.3/connectors/mongodb.html
 
 https://debezium.io/documentation/reference/configuration/mongodb-event-flattening.html
 
+https://docs.confluent.io/current/connect/transforms/valuetokey.html
