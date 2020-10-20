@@ -26,9 +26,10 @@ CREATE SOURCE CONNECTOR source_inventory WITH (
     'transforms.mongoflatten.type' = 'io.debezium.connector.mongodb.transforms.ExtractNewDocumentState',
     'transforms.mongoflatten.drop.tombstones' = 'false',
     'transforms.createKey.type' ='org.apache.kafka.connect.transforms.ValueToKey', 
-    'transforms.createKey.fields' = '_id'
+    'transforms.createKey.fields' = 'id'
 );
 ```
+
 
 ## References
 
